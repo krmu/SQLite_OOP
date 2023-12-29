@@ -1,8 +1,8 @@
 # SQLite_OOP
-SQLite piemērs rakstīts uz OOP
+SQLite piemērs rakstīts uz OOP mācību nolūkiem.
 # Datņu saturs
 ### - vizualais_logs.py 
-galvenā datne, kura jāpalaiž. Jāinstalē pysimplegui! <br>
+Galvenā datne, kura jāpalaiž. Jāinstalē pysimplegui! <br>
 ### - bazes_modelis.py
 Datne, kura satur operācijas ar datubāzi.<br>
 ### - datubaze.db 
