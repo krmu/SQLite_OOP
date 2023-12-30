@@ -6,7 +6,7 @@ dati = Apstrade()
 layout = [[sg.Button("Jauns skolēns", key="jauns_skolens"),sg.Button("Jauns priekšmets", key="jauns_prieksmets"),sg.Button("Viss skolēnu saraksts", key="visi_skoleni")],
           [sg.Button("Visi mācību priekšmeti", key="visi_macibu_prieksmeti"),sg.Button("Mainīt mācību priekšmeta nosaukumu", key="labot_macibu_prieksmetu")],
           [sg.Button("Skolēna vidējie vērtējumi", key="skolena_videjie_vertejumi"),sg.Button("Visu skolēnu vidējie vērtējumi", key="visu_skolenu_videjie_vertejumi")],
-          [sg.Button("Vidējais vērtējums mācību priekšmetos", key="videjaisnovisa")]]
+          [sg.Button("Vidējais vērtējums mācību priekšmetos", key="videjaisnovisa")],[sg.Button("Vērtējumu ievade", key="vertejumu_ievade")]]
 galvenais_logs = sg.Window("Skolēnu datubāze", layout)
 while True:
     # darbibas_veids -> poga, kura nospiesta vai vispārējais loga stāvoklis.
@@ -72,6 +72,21 @@ while True:
                 layout = [[sg.Text("Mācību priekšmeta nosaukums mainīts!")]]
             else:
                 layout = [[sg.Text("Mācību priekšmets nav atrasts vai atrasto priekšmetu skaits ir lielāks par 1.")]]
+        elif darbibas_veids == "vertejumu_ievade":
+            macibu_prieksmets = sg.popup_get_text('Atzīmju ievades mācību priekšmeta nosaukums: ', title="Mācību priekšmeta nosaukums")
+            if macibu_prieksmets =="":
+                sg.popup("Mācību priekšmets nevar būt tukšums!")
+                continue
+            dati_atbilde = dati.atzimes_macibu_prieksmeta(macibu_prieksmets)
+            if dati_atbilde is not None:
+                title = dati_atbilde[0]['prieksmeta_nosaukums']  + " - vērtējumu ievade"           
+                layout = [[sg.Text("Lai dzēstu vērtējumu, jāievada burts d ")]]
+                # Zīmē tabulu ar skolēniem un blakus ievades lauku vērtējumam
+                for d in dati_atbilde:
+                    layout.append([sg.Text(f"{d['vards']} {d['uzvards']}", size=60),sg.Input(d['atzime'],key=d['atzimesID'], size=10)])
+                layout.append([sg.Button('Saglabāt vērtības datubāzē', key="SaglabatAtzimesDB")])
+            else:       
+                layout = [[sg.Text("Neatrada mācību priekšmetu")]]
         else:   
             layout = [[sg.Text(darbibas_veids, key="new")]]
         # logā iekšā ir iepriekš jau uzģenerēts saturs.
@@ -81,5 +96,9 @@ while True:
             event, values = papildus_logs.read()
             if event == "Exit" or event == sg.WIN_CLOSED:
                 break
+            if event == "SaglabatAtzimesDB":
+                for atzimesid, vertejums in values.items():
+                    dati.mainit_atzimi(atzimesid,vertejums)
+                papildus_logs.close()
         papildus_logs.close()
 galvenais_logs.close()

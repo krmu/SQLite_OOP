@@ -15,6 +15,39 @@ class Apstrade:
         return d
     def ir_tads_prieksmets(self,nosaukums):
         return self.cur.execute(f" select * from prieksmeti where nosaukums like '%{nosaukums}%'").fetchone()
+    def atzimes_macibu_prieksmeta(self,nosaukums):
+        masivs = []
+        if self.ir_tads_prieksmets(nosaukums) is not None:
+            visi_skoleni = self.viss_skolenu_saraksts()
+            for sk in visi_skoleni:
+                ir_atzime = self.cur.execute(f"SELECT atz.*,atz.uuid as atzimesid,pr.id as prid,pr.nosaukums from {self.tabulu_nosaukumi['atzimes']} atz left join {self.tabulu_nosaukumi['prieksmeti']} pr on atz.prieksmets = pr.id where pr.nosaukums like '%{nosaukums}%' and atz.skolens ='{sk['uuid']}' ").fetchone()
+                objekta_dati = {"skid":sk['uuid'],"vards":sk['vards'],"uzvards":sk['uzvards'],"atzimesID":None,"atzime":None}
+                if ir_atzime is not None:
+                    objekta_dati['atzimesID'] = ir_atzime['atzimesid']
+                    objekta_dati['atzime'] = ir_atzime['atzime']
+                    objekta_dati['prieksmeta_nosaukums'] = ir_atzime['nosaukums']
+                else:
+                    prieksmets = self.ir_tads_prieksmets(nosaukums)
+                    objekta_dati['atzimesID'] = f"Jauna_{sk['uuid']}_{prieksmets['id']}"
+                    objekta_dati['prieksmeta_nosaukums'] = prieksmets['nosaukums']
+                masivs.append(objekta_dati)       
+            return masivs
+        #return self.cur.execute(f"SELECT sk.*,atz.atzime,atz.uuid as atzimesID, pr.nosaukums FROM {self.tabulu_nosaukumi['skoleni']} sk left join {self.tabulu_nosaukumi['atzimes']} atz on atz.skolens = sk.uuid join {self.tabulu_nosaukumi['prieksmeti']} pr on atz.prieksmets = pr.id where pr.nosaukums like '%{nosaukums}%' ").fetchall()
+    def mainit_atzimi(self,atzimes_id,vertiba):
+        if vertiba == "":
+            return
+        if vertiba == "d":
+            #dzest vertejumu
+            self.cur.execute(f"delete from atzimes where `uuid` = '{atzimes_id}' ")
+            self.con.commit()
+            print(atzimes_id,vertiba)
+        elif "Jauna_" in atzimes_id and int(vertiba) in [1,2,3,4,5,6,7,8,9,10]:
+            atzimes_dalas = atzimes_id.split("_")
+            self.cur.execute(f"insert into atzimes (uuid,prieksmets,atzime,skolens) values (?,?,?,?)",(str(uuid.uuid4()),atzimes_dalas[2],vertiba,atzimes_dalas[1]))
+            self.con.commit()
+        elif int(vertiba) in [1,2,3,4,5,6,7,8,9,10]:  
+            self.cur.execute(f"update atzimes set atzime='{vertiba}' where uuid ='{atzimes_id}' ")
+            self.con.commit()
     def viss_skolenu_saraksts(self):
         return self.cur.execute("select * from skoleni").fetchall()
     def labot_macibu_prieksmeta_nosaukumu(self,nosaukums,id):
