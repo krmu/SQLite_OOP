@@ -10,6 +10,7 @@ layout = [[sg.Button("Jauns skolēns", key="jauns_skolens"),sg.Button("Jauns pri
 galvenais_logs = sg.Window("Skolēnu datubāze", layout)
 while True:
     # darbibas_veids -> poga, kura nospiesta vai vispārējais loga stāvoklis.
+     
     darbibas_veids, values = galvenais_logs.read()
     if darbibas_veids == "Exit" or darbibas_veids == sg.WIN_CLOSED:
         break
@@ -73,6 +74,7 @@ while True:
             else:
                 layout = [[sg.Text("Mācību priekšmets nav atrasts vai atrasto priekšmetu skaits ir lielāks par 1.")]]
         elif darbibas_veids == "vertejumu_ievade":
+            #macibu_prieksmets = sg.Listbox([1,2,3,4], size=(20,4), enable_events=False, key='_LIST_')
             macibu_prieksmets = sg.popup_get_text('Atzīmju ievades mācību priekšmeta nosaukums: ', title="Mācību priekšmeta nosaukums")
             if macibu_prieksmets =="":
                 sg.popup("Mācību priekšmets nevar būt tukšums!")
@@ -82,10 +84,16 @@ while True:
                 title = dati_atbilde[0]['prieksmeta_nosaukums']  + " - vērtējumu ievade"           
                 layout = [[sg.Text("Lai dzēstu vērtējumu, jāievada burts d ")]]
                 # Zīmē tabulu ar skolēniem un blakus ievades lauku vērtējumam
+                summa = 0
+                cik_atzimes = 0
                 for d in dati_atbilde:
                     layout.append([sg.Text(f"{d['vards']} {d['uzvards']}", size=60),sg.Input(d['atzime'],key=d['atzimesID'], size=10)])
+                    if d['atzime'] != "" and d['atzime'] is not None:
+                        summa += d['atzime']
+                        cik_atzimes += 1
+                layout.append([sg.Text("Klases vidējais vērtējums:", size=60),sg.Text(round(summa/cik_atzimes,2))])
                 layout.append([sg.Button('Saglabāt vērtības datubāzē', key="SaglabatAtzimesDB")])
-            else:       
+            else:    
                 layout = [[sg.Text("Neatrada mācību priekšmetu")]]
         else:   
             layout = [[sg.Text(darbibas_veids, key="new")]]
@@ -98,7 +106,9 @@ while True:
                 break
             if event == "SaglabatAtzimesDB":
                 for atzimesid, vertejums in values.items():
-                    dati.mainit_atzimi(atzimesid,vertejums)
-                papildus_logs.close()
+                    atbilde = dati.mainit_atzimi(atzimesid,vertejums)
+                    if atbilde is not None:
+                        sg.PopupError(atbilde)
+                sg.PopupAutoClose("Atzīmju ievade veiksmīga!")                
         papildus_logs.close()
 galvenais_logs.close()
