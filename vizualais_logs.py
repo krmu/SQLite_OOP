@@ -1,5 +1,5 @@
 import PySimpleGUI as sg
-from bazes_modelis import Apstrade
+from datubazes_operacijas import Apstrade
 sg.theme("Material2")
 sg.set_options(font=("Arial",12))
 # Izsaucam datubāzes operācijas. Atrodas failā bazes_modelis.py
