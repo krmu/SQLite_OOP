@@ -33,6 +33,9 @@ class Apstrade:
                 masivs.append(objekta_dati)       
             return masivs
         #return self.cur.execute(f"SELECT sk.*,atz.atzime,atz.uuid as atzimesID, pr.nosaukums FROM {self.tabulu_nosaukumi['skoleni']} sk left join {self.tabulu_nosaukumi['atzimes']} atz on atz.skolens = sk.uuid join {self.tabulu_nosaukumi['prieksmeti']} pr on atz.prieksmets = pr.id where pr.nosaukums like '%{nosaukums}%' ").fetchall()
+    def dzest_atzimi(self,atzimes_id):
+        self.cur.execute(f"delete from atzimes where `uuid` = '{atzimes_id}' ")
+        self.con.commit()
     def mainit_atzimi(self,atzimes_id,vertiba):
         if vertiba == "":
             return "Atzīme nevar būt tukšums!"
@@ -41,12 +44,7 @@ class Apstrade:
             vertiba = int(vertiba)
         except:
             return "Atzīmei jābūt skaitlim robežās no 1 līdz 10"
-        if vertiba == "d":
-            #dzest vertejumu
-            self.cur.execute(f"delete from atzimes where `uuid` = '{atzimes_id}' ")
-            self.con.commit()
-            print(atzimes_id,vertiba)
-        elif "Jauna_" in atzimes_id and int(vertiba) in [1,2,3,4,5,6,7,8,9,10]:
+        if "Jauna_" in atzimes_id and int(vertiba) in [1,2,3,4,5,6,7,8,9,10]:
             atzimes_dalas = atzimes_id.split("_")
             self.cur.execute(f"insert into atzimes (uuid,prieksmets,atzime,skolens) values (?,?,?,?)",(str(uuid.uuid4()),atzimes_dalas[2],vertiba,atzimes_dalas[1]))
             self.con.commit()
