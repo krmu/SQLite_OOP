@@ -1,12 +1,14 @@
 import PySimpleGUI as sg
 from bazes_modelis import Apstrade
 sg.theme("Material2")
+sg.set_options(font=("Arial",12))
 # Izsaucam datubāzes operācijas. Atrodas failā bazes_modelis.py
 dati = Apstrade()
-layout = [[sg.Button("Jauns skolēns", key="jauns_skolens"),sg.Button("Jauns priekšmets", key="jauns_prieksmets"),sg.Button("Viss skolēnu saraksts", key="visi_skoleni")],
-          [sg.Button("Visi mācību priekšmeti", key="visi_macibu_prieksmeti"),sg.Button("Mainīt mācību priekšmeta nosaukumu", key="labot_macibu_prieksmetu")],
-          [sg.Button("Skolēna vidējie vērtējumi", key="skolena_videjie_vertejumi"),sg.Button("Visu skolēnu vidējie vērtējumi", key="visu_skolenu_videjie_vertejumi")],
-          [sg.Button("Vidējais vērtējums mācību priekšmetos", key="videjaisnovisa")],[sg.Button("Vērtējumu ievade", key="vertejumu_ievade")]]
+col1 = [[sg.Text("Skolēnu bloks")],[sg.Button("Jauns skolēns", key="jauns_skolens")],[sg.Button("Viss skolēnu saraksts", key="visi_skoleni")],[sg.Button("Skolēna vidējie vērtējumi", key="skolena_videjie_vertejumi")]]
+col2 = [[sg.Text("Mācību priekšmetu bloks")],[sg.Button("Jauns priekšmets", key="jauns_prieksmets")],[sg.Button("Visi mācību priekšmeti", key="visi_macibu_prieksmeti")],[sg.Button("Mainīt mācību priekšmeta nosaukumu", key="labot_macibu_prieksmetu")]]
+col3 = [[sg.Text("Vērtējumu bloks")],[sg.Button("Vērtējumu ievade", key="vertejumu_ievade")]]       
+col4 = [[sg.Text("Statistikas")],[sg.Button("Visu skolēnu vidējie vērtējumi", key="visu_skolenu_videjie_vertejumi")],[sg.Button("Vidējais vērtējums mācību priekšmetos", key="videjaisnovisa")]]       
+layout = [[sg.Column(col1, vertical_alignment='top'),sg.Column(col2, vertical_alignment='top'),sg.Column(col3, vertical_alignment='top'),sg.Column(col4, vertical_alignment='top')]]
 galvenais_logs = sg.Window("Skolēnu datubāze", layout)
 def izveles_lodzins(title, text, values):
     window = sg.Window(title,
