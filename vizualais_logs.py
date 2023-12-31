@@ -42,7 +42,7 @@ while True:
             layout = [[sg.Text(teksts)]]
             title = "Visi mācību priekšmeti datubāzē"
         elif darbibas_veids == "skolena_videjie_vertejumi":
-            skolens = sg.popup_get_text('Ievadiet skolēna uzvārdu: ', title="Skolēna uzvārds") 
+            skolens = izveles_lodzins('Skolēns: ', 'Skolēna izvēlne', [f"{x['vards']} {x['uzvards']} {x['studenta_kods']}" for x in dati.visi_skoleni()])
             if skolens is None: continue
             dati_atbilde = dati.skolena_videjais(skolens)
             if(len(dati_atbilde) > 0):
@@ -56,7 +56,8 @@ while True:
         elif darbibas_veids == "jauns_skolens":
             vards = sg.popup_get_text('Ievadiet skolēna vārdu: ', title="Skolēna vārds") 
             uzvards = sg.popup_get_text('Ievadiet skolēna uzvārdu: ', title="Skolēna uzvārds")
-            studenta_kods = sg.popup_get_text('Ievadiet skolēna kodu: ', title="Skolēna kods")
+            ids = "{:06d}".format(dati.pedejais_id()+1)
+            studenta_kods = f"{vards[0].lower()}{uzvards[0].lower()}{ids}"
             dati.jauns_skolens(vards,uzvards,studenta_kods)
             layout = [[sg.Text("Skolēns pievienots!")]]
         elif darbibas_veids == "jauns_prieksmets":
@@ -79,7 +80,7 @@ while True:
                 teksts  =  teksts + f"Vārds: {d['vards']}, uzvārds: {d['uzvards']},kods: {d['studenta_kods']}, identifikators: {d['uuid']} \n"
             layout = [[sg.Column([[sg.Text(teksts)]], size=(800, 300), scrollable=True)]]
         elif darbibas_veids == "labot_macibu_prieksmetu":
-            ko_labot = sg.popup_get_text('Labojamā mācību priekšmeta nosaukums: ', title="Mācību priekšmeta nosaukums")
+            ko_labot = izveles_lodzins('Labojamais mācību priekšmets: ', 'Mācību priekšmets', [x['nosaukums'] for x in dati.visi_macibu_prieksmeti()])
             if ko_labot is None: continue
             dati_atbilde  = dati.ir_tads_prieksmets(ko_labot)
             if(dati_atbilde is not None):

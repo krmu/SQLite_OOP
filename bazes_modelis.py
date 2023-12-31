@@ -61,8 +61,9 @@ class Apstrade:
     def jauns_skolens(self,vards,uzvards,studenta_kods):
         self.cur.execute(f"insert into {self.tabulu_nosaukumi['skoleni']} (uuid,vards,uzvards,studenta_kods) values (?,?,?,?) ",(str(uuid.uuid4()),vards,uzvards,studenta_kods))
         self.con.commit()
-    def skolena_videjais(self,uzvards):
-        return self.cur.execute(f"SELECT round(AVG(atzime),2) as atzime,pr.nosaukums,sk.vards as vards,sk.uzvards as uzvards FROM atzimes left join prieksmeti pr on  atzimes.prieksmets = pr.id left join skoleni sk on  atzimes.skolens = sk.uuid where sk.uzvards like '%{uzvards}%' group by pr.nosaukums ").fetchall()
+    def skolena_videjais(self,dalas_no_ievades):
+        skolena_dati = dalas_no_ievades.split(" ")
+        return self.cur.execute(f"SELECT round(AVG(atzime),2) as atzime,pr.nosaukums,sk.vards as vards,sk.uzvards as uzvards FROM atzimes left join prieksmeti pr on  atzimes.prieksmets = pr.id left join skoleni sk on  atzimes.skolens = sk.uuid where sk.studenta_kods = '{skolena_dati[2]}' group by pr.nosaukums ").fetchall()
     def jauns_prieksmets(self,nosaukums):
         self.cur.execute(f"insert into {self.tabulu_nosaukumi['prieksmeti']} (id,nosaukums) values (?,?) ",(str(uuid.uuid4()),nosaukums))
         self.con.commit()    
@@ -70,5 +71,9 @@ class Apstrade:
         return self.cur.execute(f"SELECT atzime, pr.nosaukums FROM {self.tabulu_nosaukumi['atzimes']} left join {self.tabulu_nosaukumi['prieksmeti']} pr on  {self.tabulu_nosaukumi['atzimes']}.prieksmets = pr.id left join {self.tabulu_nosaukumi['skoleni']} sk on  {self.tabulu_nosaukumi['atzimes']}.skolens = sk.uuid where sk.uzvards like '%{uzvards}%' order by pr.nosaukums").fetchall()
     def visu_skolenu_videjie(self,cik = 10):
         return self.cur.execute(f"SELECT round(AVG(atzime),2) videjais,pr.nosaukums,sk.vards,sk.uzvards,sk.uuid FROM {self.tabulu_nosaukumi['atzimes']} left join {self.tabulu_nosaukumi['prieksmeti']} pr on  {self.tabulu_nosaukumi['atzimes']}.prieksmets = pr.id left join {self.tabulu_nosaukumi['skoleni']} sk on  {self.tabulu_nosaukumi['atzimes']}.skolens = sk.uuid group by sk.uuid limit {cik}").fetchall()
+    def visi_skoleni(self):
+        return self.cur.execute(f"select * from {self.tabulu_nosaukumi['skoleni']} order by uzvards")
     def visi_macibu_prieksmeti(self):
         return self.cur.execute(f"select * from {self.tabulu_nosaukumi['prieksmeti']} order by nosaukums")
+    def pedejais_id(self):
+        return self.cur.execute(f"select COUNT(*) as skaits from {self.tabulu_nosaukumi['skoleni']}").fetchone()['skaits']
