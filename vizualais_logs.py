@@ -31,30 +31,32 @@ while True:
         title = "Informācija"
         if(darbibas_veids == "videjaisnovisa"):
             dati_atbilde = dati.videjais()
-            teksts = ""
-            for d in dati_atbilde:
-                teksts  =  teksts + "Priekšmets: "+ d['nosaukums'] + ", vērtējums: "+str(d['videjais'])+"\n"
-            layout = [[sg.Text(teksts)]]
+            virsraksti = ["Mācību priekšmets","Vidējais vērtējums"]
+            rindas = []
+            for d in dati_atbilde: rindas.append([d['nosaukums'],d['videjais']])     
+            layout = [[sg.Table(values=rindas, headings=virsraksti,auto_size_columns=True,expand_x = True, expand_y = True,display_row_numbers=False,justification='center')]]
             title = "Visu mācību priekšmetu vidējie vērtējumi"
         elif darbibas_veids == "visi_macibu_prieksmeti":
             dati_atbilde = dati.visi_macibu_prieksmeti()
-            teksts = ""
-            for d in dati_atbilde:
-                teksts  =  teksts + f"Priekšmets: {d['nosaukums']}, ID: {d['id']} \n"
-            layout = [[sg.Text(teksts)]]
+            virsraksti = ["Mācību priekšmets","UUID"]
+            rindas = []
+            for d in dati_atbilde: rindas.append([d['nosaukums'],d['id']])
+            layout = [[sg.Table(values=rindas, headings=virsraksti,auto_size_columns=True,expand_x = True, expand_y = True,display_row_numbers=False,justification='center')]]
             title = "Visi mācību priekšmeti datubāzē"
         elif darbibas_veids == "skolena_videjie_vertejumi":
             skolens = izveles_lodzins('Skolēns: ', 'Skolēna izvēlne', [f"{x['vards']} {x['uzvards']} {x['studenta_kods']}" for x in dati.visi_skoleni()])
             if skolens is None: continue
             dati_atbilde = dati.skolena_videjais(skolens)
+            teksts = ""
             if(len(dati_atbilde) > 0):
+                virsraksti = ["Mācību priekšmets","Vērtējums"]
+                rindas = []
                 title = f"Skolēns: {dati_atbilde[0]['vards']} {dati_atbilde[0]['uzvards']} \n"
-                teksts = ""
-                for d in dati_atbilde:
-                    teksts  =  teksts + f"Priekšmets: {d['nosaukums']}, Vērtējums: {d['atzime']} \n"
+                for d in dati_atbilde: rindas.append([d['nosaukums'],d['atzime']])
+                teksts = sg.Table(values=rindas, headings=virsraksti,auto_size_columns=True,expand_x = True, expand_y = True,display_row_numbers=False,justification='center')
             else:
-                teksts = "Datu nav."
-            layout = [[sg.Text(teksts)]]
+                teksts = sg.Text("Datu nav.")
+            layout = [[teksts]]
         elif darbibas_veids == "jauns_skolens":
             vards = sg.popup_get_text('Ievadiet skolēna vārdu: ', title="Skolēna vārds") 
             uzvards = sg.popup_get_text('Ievadiet skolēna uzvārdu: ', title="Skolēna uzvārds")
@@ -71,16 +73,16 @@ while True:
             cik_skoleni = sg.popup_get_text('Cik skolēnus atrādīt: ', title="Skolēnu skaits")
             if cik_skoleni is None: continue
             dati_atbilde = dati.visu_skolenu_videjie(cik_skoleni)
-            teksts = ""
-            for d in dati_atbilde:
-                teksts  =  teksts + f"Skolēns: {d['vards']} {d['uzvards']}, priekšmets: {d['nosaukums']}, vērtējums: {d['videjais']} \n"
-            layout = [[sg.Column([[sg.Text(teksts)]], size=(800, 300), scrollable=True)]]
+            virsraksti = ["Vārds","Uzvārds","Mācību priekšmets","Vērtējums"]
+            rindas = []
+            for d in dati_atbilde: rindas.append([d['vards'],d['uzvards'],d['nosaukums'],d['videjais']])
+            layout = [[sg.Table(values=rindas, headings=virsraksti,auto_size_columns=True,expand_x = True, expand_y = True, display_row_numbers=False,justification='center')]]
         elif darbibas_veids == "visi_skoleni":
             dati_atbilde = dati.viss_skolenu_saraksts()
-            teksts = ""
-            for d in dati_atbilde:
-                teksts  =  teksts + f"Vārds: {d['vards']}, uzvārds: {d['uzvards']},kods: {d['studenta_kods']}, identifikators: {d['uuid']} \n"
-            layout = [[sg.Column([[sg.Text(teksts)]], size=(800, 300), scrollable=True)]]
+            virsraksti = ["Vārds","Uzvārds","Studenta kods","Identifikators"]
+            rindas = []
+            for d in dati_atbilde: rindas.append([d['vards'],d['uzvards'],d['studenta_kods'],d['uuid']])
+            layout = [[sg.Table(values=rindas, headings=virsraksti,auto_size_columns=True,expand_x = True, expand_y = True,display_row_numbers=False,justification='center')]]
         elif darbibas_veids == "labot_macibu_prieksmetu":
             ko_labot = izveles_lodzins('Labojamais mācību priekšmets: ', 'Mācību priekšmets', [x['nosaukums'] for x in dati.visi_macibu_prieksmeti()])
             if ko_labot is None: continue
@@ -93,7 +95,6 @@ while True:
             else:
                 layout = [[sg.Text("Mācību priekšmets nav atrasts vai atrasto priekšmetu skaits ir lielāks par 1.")]]
         elif darbibas_veids == "vertejumu_ievade":
-            #macibu_prieksmets = sg.Listbox([1,2,3,4], size=(20,4), enable_events=False, key='_LIST_')
             macibu_prieksmets = izveles_lodzins('Mācību priekšmeta nosaukums', 'Atzīmju ievades mācību priekšmeta nosaukums:', [x['nosaukums'] for x in dati.visi_macibu_prieksmeti()])
             dati_atbilde = dati.atzimes_macibu_prieksmeta(macibu_prieksmets)
             if dati_atbilde is not None:
@@ -115,7 +116,7 @@ while True:
         else:   
             layout = [[sg.Text(darbibas_veids, key="new")]]
         # logā iekšā ir iepriekš jau uzģenerēts saturs.
-        papildus_logs = sg.Window(title, layout, modal=True) 
+        papildus_logs = sg.Window(title, layout, modal=True,size=(700, 500)) 
         while True:
             # Darbojas kamēr iziet.
             event, values = papildus_logs.read()
