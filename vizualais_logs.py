@@ -116,7 +116,7 @@ while True:
         else:   
             layout = [[sg.Text(darbibas_veids, key="new")]]
         # logā iekšā ir iepriekš jau uzģenerēts saturs.
-        papildus_logs = sg.Window(title, layout, modal=True,size=(700, 500)) 
+        papildus_logs = sg.Window(title, layout) 
         while True:
             # Darbojas kamēr iziet.
             event, values = papildus_logs.read()
