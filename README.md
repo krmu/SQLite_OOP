@@ -24,3 +24,15 @@ Datubāze. Lai atvērtu to -> https://sqlitebrowser.org/<br>
 - **uzvards** - Skolēna uzvārds
 - **studenta_kods** - Skolēna kods
 
+# Media
+## Galvenais logs 
+![Attēls](/media/main_logs.png)<br>
+## Visas vidējās atzīmes pa priekšmetiem 
+![Attēls](/media/visi_videjie.png)<br>
+## Viss skolēnu saraksts
+![Attēls](/media/viss_skolenu_saraksts.png)
+## Atzīmju ievade 
+![Attēls](/media/atzimju_ievade1.png)<br>
+![Attēls](/media/atzimju_ievade2.png)
+## Visu skolēnu vidējie vērtējumi
+![Attēls](/media/visu_skolenu_videjie.png)
